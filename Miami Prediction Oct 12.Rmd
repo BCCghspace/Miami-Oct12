@@ -848,12 +848,16 @@ sta_buffer <- st_buffer(houses, 0.5*5280) %>%
   st_as_sf()
 bufferedsta <- st_intersection(sta_buffer, nbh_stability) %>%
   group_by(Property.Address) %>%
-  summarise() %>%
-  mutate(parkArea = units::drop_units(st_area(.))) %>%
+  summarise(nbh_stability$AMIPERCENT) %>%
+  mutate(score = units::drop_units(st_area(.))) %>%
   st_drop_geometry()
 
 houses <-
   left_join(houses, bufferedsta)
+inte_sta <- st_intersects(houses, nbh_stability)
+join_sta <- st_join(houses, nbh_stability, join = st_within)
+join_sta <- houses %>% st_join(., nbh_stability, join = st_within)
+
 
 #redevelopment 
 
@@ -1209,42 +1213,65 @@ ggplot() +
   mapTheme()
 
 #park area #BC: MANY NAs
-ggplot() + 
-  geom_sf(data = houses, aes(colour = q5(parkArea))) +
-  scale_fill_manual(values = palette5) +
-  mapTheme()
+#ggplot() + 
+#  geom_sf(data = houses, aes(colour = q5(parkArea))) +
+#  scale_fill_manual(values = palette5) +
+#  mapTheme()
 
 #County.Senior
+
+county_seniorReg <- lm(SalePrice ~ County.Senior, data = houses)
+summary(county_seniorReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(County.Senior))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #County.LongTermSenior
+
+county_lsReg <- lm(SalePrice ~ County.LongTermSenior, data = houses)
+summary(county_lsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(County.LongTermSenior))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #City.Senior
+
+city_seniorReg <- lm(SalePrice ~ City.Senior, data = houses)
+summary(city_seniorReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(City.Senior))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #City.LongTermSenior
+
+city_lsReg <- lm(SalePrice ~ City.LongTermSenior, data = houses)
+summary(city_lsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(City.LongTermSenior))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Land.Use
+#luReg <- lm(SalePrice ~ Land.Use, data = houses) #weird, this doesnot work
+#summary(luReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Land.Use))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Zoning
+
+ZoningReg <- lm(SalePrice ~ Zoning, data = houses)
+summary(ZoningReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Zoning))) +
   scale_fill_manual(values = palette5) +
@@ -1252,240 +1279,357 @@ ggplot() +
 
 
 #Mailing.Zip
+mzReg <- lm(SalePrice ~ Mailing.Zip, data = houses)
+summary(mzReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Mailing.Zip))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #AdjustedSqFt
+AdjustedSqFtReg <- lm(SalePrice ~ AdjustedSqFt, data = houses)
+summary(AdjustedSqFtReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(AdjustedSqFt))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #LotSize
+LotSizeReg <- lm(SalePrice ~ LotSize, data = houses)
+summary(LotSizeReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(LotSize))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Stories
+StoriesReg <- lm(SalePrice ~ Stories, data = houses)
+summary(StoriesReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Stories))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Units
+UnitsReg <- lm(SalePrice ~ Units, data = houses)
+summary(UnitsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Units))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #LivingSqFt
+LivingSqFtReg <- lm(SalePrice ~ LivingSqFt, data = houses)
+summary(LivingSqFtReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(LivingSqFt))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #ActualSqFt
+ActualSqFtReg <- lm(SalePrice ~ ActualSqFt, data = houses)
+summary(ActualSqFtReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(ActualSqFt))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #SPSqFt
+SPSqFtReg <- lm(SalePrice ~ SPSqFt, data = houses)
+summary(SPSqFtReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(SPSqFt))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #TOD
+TODReg <- lm(SalePrice ~ TOD, data = houses)
+summary(TODReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(TOD))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #contaminated #BC FOR SOME REASON NOT WORKING 
-ggplot() + 
-  geom_sf(data = houses, aes(colour = q5(contaminated))) +
-  scale_fill_manual(values = palette5) +
-  mapTheme()
+#ggplot() + 
+#  geom_sf(data = houses, aes(colour = q5(contaminated))) +
+#  scale_fill_manual(values = palette5) +
+#  mapTheme()
 
 #contaminatedNN1
+contaminatedNN1Reg <- lm(SalePrice ~ contaminatedNN1, data = houses)
+summary(contaminatedNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(contaminatedNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #commNN1
+commNN1Reg <- lm(SalePrice ~ commNN1, data = houses)
+summary(commNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(commNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #metroMNN5
+metroMNN5Reg <- lm(SalePrice ~ metroMNN5, data = houses)
+summary(metroMNN5Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(metroMNN5))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #metroRNN1
+metroRNN1Reg <- lm(SalePrice ~ metroRNN1, data = houses)
+summary(metroRNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(metroRNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #busNN1
+busNN1rReg <- lm(SalePrice ~ busNN1, data = houses)
+summary(busNN1rReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(busNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #cultureNN1
+cultureNN1Reg <- lm(SalePrice ~ cultureNN1, data = houses)
+summary(cultureNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(cultureNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #foodBevNN1
+foodBevNN1Reg <- lm(SalePrice ~ foodBevNN1, data = houses)
+summary(foodBevNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(foodBevNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #neceshopNN3
+neceshopNN3Reg <- lm(SalePrice ~ neceshopNN3, data = houses)
+summary(neceshopNN3Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(neceshopNN3))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #nneceshopNN3
+nneceshopNN3Reg <- lm(SalePrice ~ nneceshopNN3, data = houses)
+summary(nneceshopNN3Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(nneceshopNN3))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #commercialProperties
+commercialPropertiesReg <- lm(SalePrice ~ commercialProperties, data = houses)
+summary(commercialPropertiesReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(commercialProperties))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #foodEstablishments
+foodEstablishmentsReg <- lm(SalePrice ~ foodEstablishments, data = houses)
+summary(foodEstablishmentsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(foodEstablishments))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #cultureSpot #BC: FOR SOME REASON NOT WORKING
-ggplot() + 
-  geom_sf(data = houses, aes(colour = q5(cultureSpot))) +
-  scale_fill_manual(values = palette5) +
-  mapTheme()
+#waterReg <- lm(SalePrice ~ distWater, data = houses)
+#summary(waterReg)
+
+#ggplot() + 
+#  geom_sf(data = houses, aes(colour = q5(cultureSpot))) +
+#  scale_fill_manual(values = palette5) +
+#  mapTheme()
 
 #metrorailStops
+metrorailStopsReg <- lm(SalePrice ~ metrorailStops, data = houses)
+summary(metrorailStopsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(metrorailStops))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #metromoverStops
+metromoverStopsReg <- lm(SalePrice ~ metromoverStops, data = houses)
+summary(metromoverStopsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(metromoverStops))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #busStops
+busStopsReg <- lm(SalePrice ~ busStops, data = houses)
+summary(busStopsReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(busStops))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #elemCatch
+elemCatchReg <- lm(SalePrice ~ elemCatch, data = houses)
+summary(elemCatchReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(elemCatch))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #middleCatch
+middleCatchReg <- lm(SalePrice ~ middleCatch, data = houses)
+summary(middleCatchReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(middleCatch))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #highCatch
+highCatchReg <- lm(SalePrice ~ highCatch, data = houses)
+summary(highCatchReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(highCatch))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #schoolDist
+schoolDistReg <- lm(SalePrice ~ schoolDist, data = houses)
+summary(schoolDistReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(schoolDist))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #timeToWork
+timeToWorkReg <- lm(SalePrice ~ timeToWork, data = houses)
+summary(timeToWorkReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(timeToWork))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #medHHInc
+medHHIncReg <- lm(SalePrice ~ medHHInc, data = houses)
+summary(medHHIncReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(medHHInc))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #monthhousingcost
+monthhousingcostReg <- lm(SalePrice ~ monthhousingcost, data = houses)
+summary(monthhousingcostReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(monthhousingcost))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #pctVacant
+pctVacantReg <- lm(SalePrice ~ pctVacant, data = houses)
+summary(pctVacantReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(pctVacant))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #pctWhite
+pctWhiteReg <- lm(SalePrice ~ pctWhite, data = houses)
+summary(pctWhiteReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(pctWhite))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #pctRenterOcc
+pctRenterOccReg <- lm(SalePrice ~ pctRenterOcc, data = houses)
+summary(pctRenterOccReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(pctRenterOcc))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #age
+ageReg <- lm(SalePrice ~ age, data = houses)
+summary(ageReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(age))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Bed.cat
+Bed.catReg <- lm(SalePrice ~ Bed.cat, data = houses)
+summary(Bed.catReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Bed.cat))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Bath.cat
+Bath.catReg <- lm(SalePrice ~ Bath.cat, data = houses)
+summary(Bath.catReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Bath.cat))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Pool
+PoolReg <- lm(SalePrice ~ Pool, data = houses)
+summary(PoolReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Pool))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Patio
+PatioReg <- lm(SalePrice ~ Patio, data = houses)
+summary(PatioReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Patio))) +
   scale_fill_manual(values = palette5) +
@@ -1493,65 +1637,93 @@ ggplot() +
 
 
 #Fence
+FenceReg <- lm(SalePrice ~ Fence, data = houses)
+summary(FenceReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Fence))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Gazebo
+GazeboReg <- lm(SalePrice ~ Gazebo, data = houses)
+summary(GazeboReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Gazebo))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Carport
+CarportReg <- lm(SalePrice ~ Carport, data = houses)
+summary(CarportReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Carport))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Wall
+WallReg <- lm(SalePrice ~ Wall, data = houses)
+summary(WallReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Wall))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #Dock
+DockReg <- lm(SalePrice ~ Dock, data = houses)
+summary(DockReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(Dock))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #nece_shop_buffer
+nece_shop_bufferReg <- lm(SalePrice ~ nece_shop_buffer, data = houses)
+summary(nece_shop_bufferReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(nece_shop_buffer))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #poor_shop_buffer
+poor_shop_bufferReg <- lm(SalePrice ~ poor_shop_buffer, data = houses)
+summary(poor_shop_bufferReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(poor_shop_buffer))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #n_nece_shop_buffer
+n_nece_shop_bufferReg <- lm(SalePrice ~ n_nece_shop_buffer, data = houses)
+summary(n_nece_shop_bufferReg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(n_nece_shop_buffer))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #redeNN1
+redeNN1Reg <- lm(SalePrice ~ redeNN1, data = houses)
+summary(redeNN1Reg)
+
 ggplot() + 
   geom_sf(data = houses, aes(colour = q5(redeNN1))) +
   scale_fill_manual(values = palette5) +
   mapTheme()
 
 #rede #BC:many NAs
-ggplot() + 
-  geom_sf(data = houses, aes(colour = q5(rede))) +
-  scale_fill_manual(values = palette5) +
-  mapTheme()
+#ggplot() + 
+#  geom_sf(data = houses, aes(colour = q5(rede))) +
+#  scale_fill_manual(values = palette5) +
+#  mapTheme()
 
-
+poorshopNN1Reg <- lm(SalePrice ~ poorshopNN1, data = houses)
+summary(poorshopNN1Reg)
 
 ```
