@@ -1332,7 +1332,7 @@ bothRegressions <-
 
 
 st_drop_geometry(bothRegressions) %>%
-  gather(Variable, Value, -Regression, -NAME.y) %>%
+  gather(Variable, Value, -Regression, -NAME) %>%
   filter(Variable == "SalePrice.AbsError" | Variable == "SalePrice.APE") %>%
   group_by(Regression, Variable) %>%
     summarize(meanValue = mean(Value, na.rm = T)) %>%
